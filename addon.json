@@ -1,0 +1,15 @@
+{
+  "name": "CUDA Runtime (12.9)",
+  "raw_name": "cuda-runtime-129",
+  "kind": "support",
+  "short": "CUDA runtime libraries for faster AI inference and GenAI",
+  "key": "28d97cbc-bc84-4e74-9bc2-fe0f0fccf87c",
+  "license": "NVidia license agreement",
+  "size": "1G",
+  "version": 1.0,
+  "url": "https://developer.nvidia.com/cuda/toolkit",
+  "windows-x86_64": "https://github.com/ossia/cuda/releases/download/v12.9/x86_64-pc-windows-msvc.zip",
+  "windows-amd64": "https://github.com/ossia/cuda/releases/download/v12.9/x86_64-pc-windows-msvc.zip",
+  "linux-x86_64": "https://github.com/ossia/cuda/releases/download/v12.9/x86_64-unknown-linux-gnu.zip",
+  "linux-amd64": "https://github.com/ossia/cuda/releases/download/v12.9/x86_64-unknown-linux-gnu.zip"
+}
