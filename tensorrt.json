@@ -1,0 +1,16 @@
+{
+  "name": "TensorRT Runtime (11.2)",
+  "raw_name": "tensorrt-runtime",
+  "kind": "support",
+  "short": "NVIDIA TensorRT 11.2 runtime, required by LibreDiffusion",
+  "long": "TensorRT runtime and engine builder resources (native for Turing, Ampere, Ada and Blackwell consumer GPUs, PTX for the others). Requires the CUDA Runtime package.",
+  "key": "463dfd61-ef54-442e-8861-434675efebe1",
+  "license": "NVIDIA TensorRT license agreement",
+  "size": "1200M",
+  "version": 11.2,
+  "url": "https://developer.nvidia.com/tensorrt",
+  "windows-x86_64": "https://github.com/ossia/cuda/releases/download/v13.4/tensorrt-windows-x86_64.zip",
+  "windows-amd64": "https://github.com/ossia/cuda/releases/download/v13.4/tensorrt-windows-x86_64.zip",
+  "linux-x86_64": "https://github.com/ossia/cuda/releases/download/v13.4/tensorrt-linux-x86_64.zip",
+  "linux-amd64": "https://github.com/ossia/cuda/releases/download/v13.4/tensorrt-linux-x86_64.zip"
+}

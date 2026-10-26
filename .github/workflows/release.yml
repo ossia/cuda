@@ -1,0 +1,45 @@
+name: Release
+
+# Pushing a v* tag builds the CUDA and TensorRT runtime packages for every platform
+# from NVIDIA's public redistributables (see build-package.sh) and attaches them to
+# that tag's release, under the names addon.json and tensorrt.json point to.
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag whose release to (re)build
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the release
+        run: gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "$TAG" --notes "CUDA / cuDNN and TensorRT runtime packages for ossia score."
+
+  build:
+    needs: release
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ linux-x86_64, windows-x86_64 ]
+    steps:
+      - uses: actions/checkout@v4
+      # A few GB of archives are unpacked and repacked; make room on the runner.
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Build
+        run: ./build-package.sh ${{ matrix.platform }} dist
+      - name: Upload
+        run: gh release upload "$TAG" dist/*.zip --clobber

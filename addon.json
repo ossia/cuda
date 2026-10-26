@@ -1,15 +1,16 @@
 {
-  "name": "CUDA Runtime (13.1)",
-  "raw_name": "cuda-runtime-131",
+  "name": "CUDA Runtime (13.4)",
+  "raw_name": "cuda-runtime",
   "kind": "support",
-  "short": "CUDA runtime libraries for faster AI inference and GenAI",
+  "short": "CUDA 13.4 and cuDNN 9 runtime libraries for GPU AI inference",
+  "long": "Used by the ONNX-based AI processes for GPU inference through onnxruntime's CUDA provider. Requires an NVIDIA GPU and driver supporting CUDA 13. LibreDiffusion additionally needs the TensorRT Runtime package.",
   "key": "28d97cbc-bc84-4e74-9bc2-fe0f0fccf87c",
-  "license": "NVidia license agreement",
-  "size": "3G",
-  "version": 13.1,
+  "license": "NVIDIA CUDA Toolkit and cuDNN license agreements",
+  "size": "1300M",
+  "version": 13.4,
   "url": "https://developer.nvidia.com/cuda/toolkit",
-  "windows-x86_64": "https://github.com/ossia/cuda/releases/download/v13.1/x86_64-pc-windows-msvc.zip",
-  "windows-amd64": "https://github.com/ossia/cuda/releases/download/v13.1/x86_64-pc-windows-msvc.zip",
-  "linux-x86_64": "https://github.com/ossia/cuda/releases/download/v13.1/x86_64-unknown-linux-gnu.zip",
-  "linux-amd64": "https://github.com/ossia/cuda/releases/download/v13.1/x86_64-unknown-linux-gnu.zip"
+  "windows-x86_64": "https://github.com/ossia/cuda/releases/download/v13.4/cuda-windows-x86_64.zip",
+  "windows-amd64": "https://github.com/ossia/cuda/releases/download/v13.4/cuda-windows-x86_64.zip",
+  "linux-x86_64": "https://github.com/ossia/cuda/releases/download/v13.4/cuda-linux-x86_64.zip",
+  "linux-amd64": "https://github.com/ossia/cuda/releases/download/v13.4/cuda-linux-x86_64.zip"
 }
