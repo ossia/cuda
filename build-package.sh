@@ -7,13 +7,13 @@
 #   tensorrt-<platform>.zip  TensorRT 11: the runtime librediffusion loads, with the
 #                            builder resources it needs to build engines.
 #
-# Every library is flat at the zip root, once, with no symlinks (score's package
-# manager extracts with miniz). On Linux each is stored under its soname, the layout
-# NVIDIA's own pip wheels use: NEEDED entries then resolve through the libraries'
-# $ORIGIN runpath to this directory, never to a system copy of another version.
-# score also dlopen()s every file under {RootPath}/support at startup, so bare-name
-# dlopen()s resolve to the already-loaded objects. cuDNN's dispatcher first tries
-# "libcudnn_graph.so.9.27.0" and friends, then falls back to the soname.
+# Libraries are flat at the zip root, laid out the way NVIDIA ships them: on Linux the
+# real file (libcudnn_graph.so.9.27.0) plus symbolic links under the names it is
+# looked up by (its soname, libcudnn_graph.so.9). The links matter: NEEDED entries
+# and cuDNN's dispatcher, which dlopen()s "libcudnn_graph.so.9.27.0" by full version,
+# both resolve through the libraries' $ORIGIN runpath to this directory, never to a
+# system copy of another or the same version. score's package manager restores the
+# links when it extracts (zipdownloader with symlink support, score > 3.9).
 #
 # Usage: build-package.sh <linux-x86_64|windows-x86_64> <output-dir>
 # All sources are NVIDIA's public, login-free redistributables.
@@ -79,21 +79,24 @@ mkdir -p "$WORK/cuda" "$WORK/tensorrt"
 touch "$WORK/found"
 
 # Copy the files matching one pattern (a name or a symlink to it) from an extracted
-# tree into a stage directory, once per library: under its soname on Linux, under its
-# own name otherwise. Patterns that matched are recorded in $WORK/found. Returns 1
-# when none did.
+# tree into a stage directory: the real file once under its own name, and on Linux a
+# relative symlink to it under the matched name and under its soname. Patterns that
+# matched are recorded in $WORK/found. Returns 1 when none did.
 take() {
-  local tree="$1" stage="$2" pat="$3" found=1 real name soname
+  local tree="$1" stage="$2" pat="$3" found=1 real name soname alias
   while IFS= read -r -d '' f; do
     real="$(realpath "$f")"
     name="$(basename "$real")"
-    # Only a soname that prefixes the file name: TensorRT's builder resources carry a
-    # placeholder soname and are dlopen()ed by their full file name.
+    [[ -e "$stage/$name" ]] || cp "$real" "$stage/$name"
     if [[ $PLATFORM == linux-* ]]; then
+      # Only a soname that prefixes the file name: TensorRT's builder resources carry
+      # a placeholder soname and are dlopen()ed by their full file name.
       soname="$(readelf -d "$real" | sed -n 's/.*(SONAME).*\[\(.*\)\]/\1/p')"
-      [[ -n "$soname" && $name == "$soname"* ]] && name="$soname"
+      [[ -n "$soname" && $name == "$soname"* ]] || soname=""
+      for alias in "$(basename "$f")" "$soname"; do
+        [[ -n "$alias" && $alias != "$name" ]] && ln -sfn "$name" "$stage/$alias"
+      done
     fi
-    cp "$real" "$stage/$name"
     found=0
   done < <(find "$tree" \( -type f -o -type l \) -name "$pat" -print0)
   ((found == 0)) && echo "$pat" >> "$WORK/found"
@@ -182,7 +185,8 @@ for pkg in cuda tensorrt; do
   zip="$OUT/$pkg-$PLATFORM.zip"
   rm -f "$zip"
   ls -l "$WORK/$pkg"
-  (cd "$WORK/$pkg" && zip -q -9 "$zip" ./*)
+  # -y: store the symbolic links as links, not as copies of their targets.
+  (cd "$WORK/$pkg" && zip -q -9 -y "$zip" ./*)
   rm -rf "${WORK:?}/$pkg"
   size=$(stat -c %s "$zip")
   echo "package: $zip ($((size / 1048576)) MB)"
