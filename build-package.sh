@@ -81,20 +81,26 @@ touch "$WORK/found"
 # Copy the files matching one pattern (a name or a symlink to it) from an extracted
 # tree into a stage directory: the real file once under its own name, and on Linux a
 # relative symlink to it under the matched name and under its soname. Patterns that
-# matched are recorded in $WORK/found. Returns 1 when none did.
+# matched are recorded in $WORK/found. Returns 1 when none did; exits when a copy or a
+# link fails (callers run it under "|| true", where set -e does not apply).
+die() { echo "error: $*" >&2; exit 1; }
+
 take() {
-  local tree="$1" stage="$2" pat="$3" found=1 real name soname alias
+  local tree="$1" stage="$2" pat="$3" found=1 real name soname alias dynamic
   while IFS= read -r -d '' f; do
-    real="$(realpath "$f")"
+    real="$(realpath "$f")" || die "cannot resolve $f"
     name="$(basename "$real")"
-    [[ -e "$stage/$name" ]] || cp "$real" "$stage/$name"
+    [[ -e "$stage/$name" ]] || cp "$real" "$stage/$name" || die "cannot copy $real"
     if [[ $PLATFORM == linux-* ]]; then
       # Only a soname that prefixes the file name: TensorRT's builder resources carry
       # a placeholder soname and are dlopen()ed by their full file name.
-      soname="$(readelf -d "$real" | sed -n 's/.*(SONAME).*\[\(.*\)\]/\1/p')"
+      dynamic="$(readelf -d "$real")" || die "cannot read $real"
+      soname="$(sed -n 's/.*(SONAME).*\[\(.*\)\]/\1/p' <<<"$dynamic")"
       [[ -n "$soname" && $name == "$soname"* ]] || soname=""
       for alias in "$(basename "$f")" "$soname"; do
-        [[ -n "$alias" && $alias != "$name" ]] && ln -sfn "$name" "$stage/$alias"
+        if [[ -n "$alias" && $alias != "$name" ]]; then
+          ln -sfn "$name" "$stage/$alias" || die "cannot link $stage/$alias"
+        fi
       done
     fi
     found=0
