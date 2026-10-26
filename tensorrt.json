@@ -7,7 +7,7 @@
   "key": "463dfd61-ef54-442e-8861-434675efebe1",
   "license": "NVIDIA TensorRT license agreement",
   "size": "1200M",
-  "version": 11.2,
+  "version": 1,
   "url": "https://developer.nvidia.com/tensorrt",
   "windows-x86_64": "https://github.com/ossia/cuda/releases/download/v13.4/tensorrt-windows-x86_64.zip",
   "windows-amd64": "https://github.com/ossia/cuda/releases/download/v13.4/tensorrt-windows-x86_64.zip",

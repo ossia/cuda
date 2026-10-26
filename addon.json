@@ -7,7 +7,7 @@
   "key": "28d97cbc-bc84-4e74-9bc2-fe0f0fccf87c",
   "license": "NVIDIA CUDA Toolkit and cuDNN license agreements",
   "size": "1300M",
-  "version": 13.4,
+  "version": 2,
   "url": "https://developer.nvidia.com/cuda/toolkit",
   "windows-x86_64": "https://github.com/ossia/cuda/releases/download/v13.4/cuda-windows-x86_64.zip",
   "windows-amd64": "https://github.com/ossia/cuda/releases/download/v13.4/cuda-windows-x86_64.zip",
